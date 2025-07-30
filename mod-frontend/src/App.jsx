@@ -1,5 +1,7 @@
 import { useContext } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 import { UserContext } from "./context/UserContext";
 import Sidebar from "./components/Sidebar";
@@ -12,6 +14,8 @@ import Portfolio from "./pages/Portfolio";
 import Orders from "./pages/Orders";
 import Execution from "./pages/Execution";
 import Risk from "./pages/Risk";
+import "./styles/App.css";
+
 
 export default function App() {
   const { user } = useContext(UserContext);
