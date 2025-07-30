@@ -1,30 +1,61 @@
-import { useState } from 'react';
+import { useContext } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
-function App() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+import { UserContext } from "./context/UserContext";
+import Sidebar from "./components/Sidebar";
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    console.log('Logging in with:', { email, password });
-  };
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import Jobs from "./pages/Jobs";
+import Tasks from "./pages/Tasks";
+import Portfolio from "./pages/Portfolio";
+import Orders from "./pages/Orders";
+import Execution from "./pages/Execution";
+import Risk from "./pages/Risk";
+
+export default function App() {
+  const { user } = useContext(UserContext);
+  const location = useLocation();
+
+  const isLoginPage = location.pathname === "/";
 
   return (
-    <div className="vh-100 d-flex justify-content-center align-items-center bg-dark text-white">
-      <form className="p-5 rounded bg-secondary" onSubmit={handleLogin} style={{ minWidth: '300px' }}>
-        <h2 className="text-center mb-4">MOD Login</h2>
-        <div className="mb-3">
-          <label className="form-label">Email</label>
-          <input type="email" className="form-control" required value={email} onChange={e => setEmail(e.target.value)} />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Password</label>
-          <input type="password" className="form-control" required value={password} onChange={e => setPassword(e.target.value)} />
-        </div>
-        <button type="submit" className="btn btn-primary w-100">Log In</button>
-      </form>
+    <div style={{ display: "flex" }}>
+      {!isLoginPage && user && <Sidebar />}
+
+      <div style={{ flex: 1, padding: "20px" }}>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route
+            path="/dashboard"
+            element={user ? <Dashboard /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/jobs"
+            element={user ? <Jobs /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/tasks"
+            element={user ? <Tasks /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/portfolio"
+            element={user ? <Portfolio /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/orders"
+            element={user ? <Orders /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/execution"
+            element={user ? <Execution /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/risk"
+            element={user ? <Risk /> : <Navigate to="/" />}
+          />
+        </Routes>
+      </div>
     </div>
   );
 }
-
-export default App;
