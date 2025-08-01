@@ -1,121 +1,64 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Link, useLocation } from "react-router-dom";
-import {
-  FaChartBar,
-  FaTasks,
-  FaCogs,
-  FaBriefcase,
-  FaSignOutAlt,
-  FaUser,
-  FaChevronDown,
-  FaChevronRight,
-} from "react-icons/fa";
-import { supabase } from "../supabaseClient";
+import { useContext } from "react";
 import { UserContext } from "../context/UserContext";
-import "../styles/Sidebar.css";
+import { useNavigate, NavLink } from "react-router-dom";
+import { FaTachometerAlt, FaSignOutAlt, FaBriefcase, FaChartLine, FaLayerGroup } from "react-icons/fa";
+import { supabase } from "../lib/supabaseClient";
 
-const Sidebar = () => {
-  const location = useLocation();
-  const { user } = useContext(UserContext);
-  const [expanded, setExpanded] = useState({
-    overview: false,
-    management: false,
-  });
-  const [sessionTime, setSessionTime] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => setSessionTime((t) => t + 1), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const toggleSection = (section) => {
-    setExpanded((prev) => ({ ...prev, [section]: !prev[section] }));
-  };
-
-  const formatTime = (secs) => {
-    const minutes = String(Math.floor(secs / 60)).padStart(2, "0");
-    const seconds = String(secs % 60).padStart(2, "0");
-    return `${minutes}:${seconds}`;
-  };
+function Sidebar() {
+  const { user, setUser } = useContext(UserContext) || {};
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    window.location.href = "/";
+    setUser(null);
+    navigate("/login");
   };
 
   return (
-    <div className="sidebar">
-      <div className="sidebar-header">MOD</div>
+    <div className="bg-dark text-white vh-100 p-3 d-flex flex-column" style={{ width: "250px" }}>
+      <div>
+        <h5 className="mb-4">MOD</h5>
 
-      <div className="section">
-        <div className="section-header" onClick={() => toggleSection("overview")}>
-          <span>MOD Overview</span>
-          {expanded.overview ? <FaChevronDown /> : <FaChevronRight />}
+        <div>
+          <h6 className="text-uppercase text-muted small">MOD Overview</h6>
+          <NavLink to="/dashboard" className="d-block text-white text-decoration-none mb-2" activeclassname="fw-bold">
+            <FaTachometerAlt className="me-2" />
+            Dashboard
+          </NavLink>
         </div>
-        {expanded.overview && (
-          <ul>
-            <li>
-              <Link to="/dashboard" className={location.pathname === "/dashboard" ? "active" : ""}>
-                <FaChartBar className="icon" /> MOD Dash
-              </Link>
-            </li>
-            <li>
-              <Link to="/jobs">
-                <FaTasks className="icon" /> MOD Jobs
-              </Link>
-            </li>
-            <li>
-              <Link to="/tasks">
-                <FaTasks className="icon" /> MOD Tasks
-              </Link>
-            </li>
-          </ul>
-        )}
+
+        <div className="mt-4">
+          <h6 className="text-uppercase text-muted small">MOD Management</h6>
+          <NavLink to="/portfolios" className="d-block text-white text-decoration-none mb-2" activeclassname="fw-bold">
+            <FaLayerGroup className="me-2" />
+            Portfolio Management
+          </NavLink>
+          <NavLink to="/orders" className="d-block text-white text-decoration-none mb-2" activeclassname="fw-bold">
+            <FaBriefcase className="me-2" />
+            Order Management
+          </NavLink>
+          <NavLink to="/risk" className="d-block text-white text-decoration-none" activeclassname="fw-bold">
+            <FaChartLine className="me-2" />
+            Risk Management
+          </NavLink>
+        </div>
       </div>
 
-      <div className="section">
-        <div className="section-header" onClick={() => toggleSection("management")}>
-          <span>MOD Management</span>
-          {expanded.management ? <FaChevronDown /> : <FaChevronRight />}
-        </div>
-        {expanded.management && (
-          <ul>
-            <li>
-              <Link to="/portfolio">
-                <FaBriefcase className="icon" /> Portfolio Management
-              </Link>
-            </li>
-            <li>
-              <Link to="/orders">
-                <FaBriefcase className="icon" /> Order Management
-              </Link>
-            </li>
-            <li>
-              <Link to="/execution">
-                <FaBriefcase className="icon" /> Execution Management
-              </Link>
-            </li>
-            <li>
-              <Link to="/risk">
-                <FaBriefcase className="icon" /> Risk Management
-              </Link>
-            </li>
-          </ul>
+      <div className="mt-auto">
+        {user && (
+          <div className="mb-2 small text-truncate text-light" title={user.email}>
+            {user.email}
+          </div>
         )}
-      </div>
-
-      <div className="sidebar-footer">
-        <div className="user-info">
-          <FaUser className="icon" />
-          <span>{user?.email}</span>
-        </div>
-        <div className="session-timer">Session: {formatTime(sessionTime)}</div>
-        <button className="logout-btn" onClick={handleLogout}>
-          <FaSignOutAlt /> Logout
+        <button
+          onClick={handleLogout}
+          className="btn btn-outline-light btn-sm w-100 d-flex align-items-center justify-content-center"
+        >
+          <FaSignOutAlt className="me-2" /> Logout
         </button>
       </div>
     </div>
   );
-};
+}
 
 export default Sidebar;
